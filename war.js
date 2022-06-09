@@ -73,9 +73,17 @@ function war(playerCount) {
       const topCard = player.cards.shift()
       cardBattle.push(topCard)
     })
+    console.log(cardBattle)
+    if (cardBattle[0].points > cardBattle[1].points) {
+      players[0].cards.push(...cardBattle)
+    }
+    else if (cardBattle[0].points < cardBattle[1].points) {
+      players[1].cards.push(...cardBattle)
+    }
+    cardBattle.splice(0)
+    console.log(cardBattle)
     console.log(players[0].cards.length)
     console.log(players[1].cards.length)
-    console.log(cardBattle)
   }
   playRound()
 }

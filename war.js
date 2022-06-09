@@ -66,7 +66,18 @@ function war(playerCount) {
     }
   }
   dealWar()
-  console.log(players[0], players[1])
+
+  function playRound() {
+    const cardBattle = []
+    players.forEach(player => {
+      const topCard = player.cards.shift()
+      cardBattle.push(topCard)
+    })
+    console.log(players[0].cards.length)
+    console.log(players[1].cards.length)
+    console.log(cardBattle)
+  }
+  playRound()
 }
 
 war(2)

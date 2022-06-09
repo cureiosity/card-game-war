@@ -1,5 +1,5 @@
-const cardNames = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king', 'ace']
-const suits = ['clubs', 'diamonds', 'hearts', 'spades']
+const cardNames = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+const suits = ['\u2663', '\u2666', '\u2665', '\u2660']
 const points = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 
 class Deck {
@@ -49,6 +49,7 @@ function war(playerCount) {
   const deck = new Deck()
   shuffle(deck)
   const players = []
+  let roundCount = 0
 
   function dealWar() {
     for (i = 1; i <= playerCount; i++) {
@@ -68,23 +69,34 @@ function war(playerCount) {
   dealWar()
 
   function playRound() {
+    roundCount++
+    console.log(`------ Round ${roundCount} ------`)
+    console.log('')
     const cardBattle = []
     players.forEach(player => {
       const topCard = player.cards.shift()
       cardBattle.push(topCard)
     })
-    console.log(cardBattle)
+    console.log(`Player 1: ${cardBattle[0].cardName}${cardBattle[0].suit}`)
+    console.log(`Player 2: ${cardBattle[1].cardName}${cardBattle[1].suit}`)
+    console.log('')
     if (cardBattle[0].points > cardBattle[1].points) {
+      console.log('Player 1 wins the round')
+      console.log('')
       players[0].cards.push(...cardBattle)
     }
     else if (cardBattle[0].points < cardBattle[1].points) {
+      console.log('Player 2 wins the round')
+      console.log('')
       players[1].cards.push(...cardBattle)
     }
     cardBattle.splice(0)
-    console.log(cardBattle)
-    console.log(players[0].cards.length)
-    console.log(players[1].cards.length)
+    console.log(`Player 1 now has ${players[0].cards.length} cards`)
+    console.log(`Player 2 now has ${players[1].cards.length} cards`)
+    console.log('')
   }
+  playRound()
+  playRound()
   playRound()
 }
 

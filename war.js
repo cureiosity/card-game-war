@@ -30,6 +30,8 @@ class Player {
   constructor(name) {
     this.name = name
     this.cards = []
+    this.warCards = []
+    this.hasWarCards = true
   }
 }
 
@@ -49,6 +51,7 @@ function war(playerCount) {
   const deck = new Deck()
   shuffle(deck)
   const players = []
+  const cardBattle = []
   let roundCount = 0
 
   function dealWar() {
@@ -72,7 +75,6 @@ function war(playerCount) {
     roundCount++
     console.log(`------ Round ${roundCount} ------`)
     console.log('')
-    const cardBattle = []
     players.forEach(player => {
       const topCard = player.cards.shift()
       cardBattle.push(topCard)
@@ -88,30 +90,12 @@ function war(playerCount) {
     else if (cardBattle[0].points < cardBattle[1].points) {
       console.log('Player 2 wins the round')
       console.log('')
+      cardBattle.reverse()
       players[1].cards.push(...cardBattle)
     } else {
       console.log('WAR!!!')
       console.log('')
-      const warBattle = []
-      players.forEach(player => {
-        const warCards = []
-        while (warCards.length < 4) {
-          warCards.push(player.cards.shift())
-        }
-        warBattle.push(warCards)
-      })
-      console.log(`Player 1 puts three cards down, and their next card is ${warBattle[0][3].cardName}${warBattle[0][3].suit}`)
-      console.log(`Player 2 puts three cards down, and their next card is ${warBattle[1][3].cardName}${warBattle[1][3].suit}`)
-      console.log('')
-      if (warBattle[0][3].points > warBattle[1][3].points) {
-        console.log('Player 1 wins the war!')
-        console.log('')
-        players[0].cards.push(...warBattle[0], ...cardBattle, ...warBattle[1])
-      } else if (warBattle[0][3].points < warBattle[1][3].points) {
-        console.log('Player 2 wins the war!')
-        console.log('')
-        players[1].cards.push(...warBattle[1], ...cardBattle, ...warBattle[0])
-      }
+      tie()
     }
     cardBattle.splice(0)
     console.log(`Player 1 now has ${players[0].cards.length} cards`)
@@ -119,15 +103,62 @@ function war(playerCount) {
     console.log('')
   }
 
+  function tie() {
+    players.forEach(player => {
+      if (player.cards.length >= 4) {
+        player.hasWarCards = true
+        for (i = 0; i < 4; i++) {
+          player.warCards.push(player.cards.shift())
+        }
+      } else if (player.cards.length > 0) {
+        player.hasWarCards = true
+        while (player.cards.length > 0) {
+          player.warCards.push(player.cards.shift())
+        }
+      } else {
+        player.hasWarCards = false
+        player.warCards.push(cardBattle[players.indexOf(player)])
+        cardBattle.splice(players.indexOf(player), 1)
+      }
+    })
+    if (players[0].hasWarCards === true && players[1].hasWarCards === true) {
+      console.log(`Player 1 puts ${players[0].warCards.length - 1} cards down, and their next card is ${players[0].warCards[players[0].warCards.length - 1].cardName}${players[0].warCards[players[0].warCards.length - 1].suit}`)
+      console.log(`Player 2 puts ${players[1].warCards.length - 1} cards down, and their next card is ${players[1].warCards[players[1].warCards.length - 1].cardName}${players[1].warCards[players[1].warCards.length - 1].suit}`)
+    } else if (players[0].hasWarCards === false) {
+      console.log(`Player 1 doesn't have any more cards, so their war card is still ${players[0].warCards[players[0].warCards.length - 1].cardName}${players[0].warCards[players[0].warCards.length - 1].suit}`)
+      console.log(`Player 2 puts ${players[1].warCards.length - 1} cards down, and their next card is ${players[1].warCards[players[1].warCards.length - 1].cardName}${players[1].warCards[players[1].warCards.length - 1].suit}`)
+    } else if (players[1].hasWarCards === false) {
+      console.log(`Player 1 puts ${players[0].warCards.length - 1} cards down, and their next card is ${players[0].warCards[players[0].warCards.length - 1].cardName}${players[0].warCards[players[0].warCards.length - 1].suit}`)
+      console.log(`Player 2 doesn't have any more cards, so their war card is still ${players[1].warCards[players[1].warCards.length - 1].cardName}${players[1].warCards[players[1].warCards.length - 1].suit}`)
+    }
+    console.log('')
+    if (players[0].warCards[players[0].warCards.length - 1].points > players[1].warCards[players[1].warCards.length - 1].points) {
+      console.log('Player 1 wins the war!')
+      console.log('')
+      players[0].cards.push(...players[0].warCards, ...cardBattle, ...players[1].warCards)
+      players[0].warCards.length = 0
+      players[1].warCards.length = 0
+    } else if (players[0].warCards[players[0].warCards.length - 1].points < players[1].warCards[players[1].warCards.length - 1].points) {
+      console.log('Player 2 wins the war!')
+      console.log('')
+      players[1].cards.push(...players[1].warCards, ...cardBattle, ...players[0].warCards)
+      players[0].warCards.length = 0
+      players[1].warCards.length = 0
+    } else {
+      console.log('DOUBLE WAR!!!')
+      tie()
+    }
+  }
+
   while (players[0].cards.length > 0 && players[1].cards.length > 0) {
     playRound()
   }
 
   if (players[0].cards.length === 52) {
-    console.log('PLAYER 1 IS THE WINNER!!!!!!')
+    console.log('PLAYER 1 IS THE WINNER!!!!!')
   }
   if (players[1].cards.length === 52) {
-    console.log('PLAYER 2 IS THE WINNER!!!!!!')
+    console.log('PLAYER 2 IS THE WINNER!!!!!')
   }
 }
 
